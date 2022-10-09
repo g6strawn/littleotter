@@ -1,0 +1,147 @@
+/* Copyright (c) 2022 Gary Strawn, All rights reserved */
+/* Little Otter Take Home - Bike Rental API */
+
+.too_narrow {
+  display: none;
+  text-align: center;
+  font-size: 12pt;
+  color: brown;
+}
+@media all and (max-width: 540px) {
+  .too_narrow { display: block; }
+  body { min-width: 535px; }
+}
+
+h1, h4 {
+  text-align: center;
+}
+h4 {
+  margin-bottom: 0;
+}
+
+
+/* header (above table) */
+#station {
+  display: block;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#hourlyInput {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+  margin: 1em auto;
+}
+
+#hourlyToFrom {
+  display: inline-block;
+  display: flex;
+  flex-direction: column;
+}
+
+#hourlyDate, #hourlyHour {
+  width: 3.5em;
+  text-align: center;
+}
+#hourlyRented {
+  display: inline-block;
+  width: 2em;
+}
+
+
+/* hourly table */
+img#hourlyTableLoading {
+  display: table;
+  margin: 1em auto;
+  padding: 1em;
+}
+
+#hourlyTable {
+  margin: 1em auto;
+  text-align: center;
+  border-spacing: 0;
+  cursor: pointer;
+  user-select: none;
+}
+#hourlyTable th {
+  font-size: smaller;
+  width: 1.5em;
+  padding: 0;
+}
+#hourlyTable td {
+  color: white;
+  padding: 1px;
+}
+#hourlyTable td.tdCurr {
+  color: yellow;
+  font-weight: bold;
+  padding: 0;
+  border: 1px solid yellow;
+}
+
+
+/* footer notes */
+#hourlyNotes {
+  max-width: 480px;
+  margin: 0.5em auto 2em auto;
+  font-size: small;
+}
+#hourlyNotes li {
+  padding-bottom: 0.25em;
+}
+#noteStationToFrom {
+  font-weight: bold;
+  font-size: larger;
+}
+
+/* statistics - single line instead of two */
+dl {
+  display: grid;
+  grid-template-columns: max-content auto;
+  justify-content: center;
+}
+dt { grid-column-start: 1;  text-align: right; }
+dd { grid-column-start: 2;  margin-inline-start: 0.5em; }
+
+
+/* Ages Table for all stations */
+#agesTable {
+  margin: 3em auto;
+  text-align: center;
+  border-spacing: 0;
+  padding: 0.5em;
+  background-color: antiquewhite;
+}
+#agesTable tr:nth-child(6n+4), 
+#agesTable tr:nth-child(6n+5),
+#agesTable tr:nth-child(6n+6) {
+  background-color: bisque;
+}
+#agesTable caption {
+  font-size: 18pt;
+  font-weight: bold;
+}
+#agesTable th {
+  padding: 0 0.25em;
+}
+#agesTable td:nth-child(4), #agesTable th:nth-child(4) {
+  text-align: left;
+  padding-left: 0.25em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+hr {
+  width: 50%;
+  color: lightgray;
+  margin-top: 2em;
+}
+#ftrCopyright {
+  margin: 0 auto 1em auto;
+  font-size: small;
+  text-align: center;
+}
