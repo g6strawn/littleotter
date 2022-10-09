@@ -97,13 +97,26 @@ foreach($aStations as $id => $name)
 <dl id="hourlyStats">
 </dl>
 
+<!-- ages --><?php
+$aAge = DB::Run('SELECT MIN(2015 - `birth_year`) as `ageMin`, 
+						MAX(2015 - `birth_year`) as `ageMax`, 
+						AVG(2015 - `birth_year`) as `ageAvg` 
+				FROM `trips`'
+		.($stationID ? " WHERE `start_station`=$stationID" : ''))->fetch();
+?>
+<dl id="ageStats">
+  <dt>Minimum Age: </dt><dd><?= $aAge['ageMin'] ?></dd>
+  <dt>Average Age: </dt><dd><?= round($aAge['ageAvg'], 1) ?></dd>
+  <dt>Maximum Age: </dt><dd><?= $aAge['ageMax'] ?></dd>
+</dl>
+
 <?php if(!$stationID) { ?>
 <!-- Ages for all stations -->
 <table id="agesTable">
   <caption title="Age in 2015">Age distributions</caption>
   <thead><tr><th>Min</th><th>Avg</th><th>Max</th><th>Station</th></tr></thead>
   <tbody><?php
-	$aStations = DB::Run('SELECT * FROM `stations` ORDER BY ageAvg')->fetchAll();
+	$aStations = DB::Run('SELECT * FROM `stations` ORDER BY name')->fetchAll();
 	foreach($aStations as $station) {
 		$aAge = DB::Run('SELECT MIN(2015 - `birth_year`) as `ageMin`, 
 								MAX(2015 - `birth_year`) as `ageMax`, 
@@ -114,21 +127,10 @@ foreach($aStations as $id => $name)
 				."<td>{$aAge['ageMax']}</td>"
 				."<td>{$station['name']}</td></tr>\n";
 	}
-?>
+} ?>
   </tbody>
 </table>
-<?php } else {
-	$aAge = DB::Run('SELECT MIN(2015 - `birth_year`) as `ageMin`, 
-							MAX(2015 - `birth_year`) as `ageMax`, 
-							AVG(2015 - `birth_year`) as `ageAvg` 
-					FROM `trips` WHERE `start_station`='. $stationID)->fetch();
-?>
-  <dl id="ageStats">
-    <dt>Minimum Age: </dt><dd><?= $aAge['ageMin'] ?></dd>
-    <dt>Average Age: </dt><dd><?= $aAge['ageAvg'] ?></dd>
-    <dt>Maximum Age: </dt><dd><?= $aAge['ageMax'] ?></dd>
-  </dl>
-<?php } ?>
+
 
 <hr>
 <div id="ftrCopyright">
