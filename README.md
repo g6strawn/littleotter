@@ -30,17 +30,23 @@
 
 * permalinks - When I'm interviewing coders, I want to see an understanding of the fundamentals such as fetch(). Therefore I started this solution using fetch. However, it made more sense to keep the API server-side and has the added bonus of permalinks. The GET params are right there in the URL.
 
+## Part 3 Extras
+
+* statistics - average use, busiest surge, busiest time of day
+
+* inventory - The maintenance team has to repair the bikes no matter what. The real issue is inventory. Are some stations overflowing and others empty? Where are the bikes every day.
+
 ## Further TODO
 
 * responsive - This shouldn't be too difficult. The only real constraint is the size of the table and underlying canvas. For smaller screens the table may require a smaller font and the canvas will need to resize appropriately.
 
 * artsy - Dammit Jim, I'm a coder, not an artist. A graphic designer would surely have ideas for flashier graphics but I was more focused on easy access to the actual data. Still, a little flash and bling might be nice.
 
-* inventory - The maintenance team has to repair the bikes no matter what. The real issue is inventory. Are some stations overflowing and others empty? Where are the bikes every day.
+* age / gender - Part 2, if the marketing team "is interested in creating relevant advertising" then they probably also care about gender in addition to age.
 
-* ride duration - should be easy enough to add this statistic.
+* ride duration - Do some stations get long rentals while others are always short trips?
 
-* lat/long - Maps are always fun and the Google Maps API is easy to use. But frankly, been there, done that, and right now I'd rather go have a Mai Tai on the beach.
+* lat/long - Maps are always fun and the Google Maps API is easy to use. But frankly, right now I'd rather go have another Mai Tai on the beach.
 
 ## Author
 

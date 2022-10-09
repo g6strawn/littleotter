@@ -81,13 +81,13 @@ function BuildDB() {
 
 //---------------------------------------------------------------------------
 //GetTrips - fetch #bikes rented
-function GetTrips($stationID, $toFrom, $inventory) {
+function GetTrips($stationID, $view) {
 	//build query string
 	$qry = 'SELECT COUNT(*) FROM `trips` WHERE '
 			.'%1$s_time >= "2015-02-%2$02d %3$02d:00:00" AND '
 			.'%1$s_time <= "2015-02-%2$02d %3$02d:59:59"';
 	if($stationID) {
-		$qry .= sprintf(' AND %s_station=?', $toFrom == 'from' ? 'start' : 'stop');
+		$qry .= sprintf(' AND %s_station=?', $view == 'to' ? 'stop' : 'start');
 		$param[] = $stationID;
 	} else {
 		$param = [];
@@ -95,29 +95,32 @@ function GetTrips($stationID, $toFrom, $inventory) {
 
 	//build 28*24 array
 	$sTrips = '';
-	$num = 0; //running total
-	for($day = 1;  $day <= 28;  $day++) {
-		for($hour = 0;  $hour < 24;  $hour++) {
-			$numOut = DB::Run(sprintf($qry, 'start', $day, $hour), $param)->fetchColumn();
-			$numIn  = DB::Run(sprintf($qry, 'stop',  $day, $hour), $param)->fetchColumn();
-// dbg("<pre>day=$day, hour=$hour, station=".($param[0] ?? 0) ."\n"
-// 	."  numOut=$numOut = ". sprintf($qry, 'start', $day, $hour) ."\n"
-// 	."   numIn=$numIn = ".  sprintf($qry, 'stop',  $day, $hour) ."</pre>\n");
-
-			if($toFrom == 'to') {
-				$num += $numIn; //add arrivals
-				$sTrips .= $num; //total rented for this hour
-				$num -= $numOut; //subtract departures
-			} else {
-				$num += $numOut; //add departures
-				$sTrips .= $num .','; //total rented for this hour
-				$num -= $numIn; //subtract arrivals
-			}
-		}
-	}
+	if($view == 'inv') {
+		$num = 0; //running total
+		for($day = 1;  $day <= 28;  $day++) {
+			for($hour = 0;  $hour < 24;  $hour++) {
+				$num += DB::Run(sprintf($qry, 'start', $day, $hour), $param)->fetchColumn();
+				$sTrips .= $num .','; //total inventory at end of hour
+				$num -= DB::Run(sprintf($qry, 'stop',  $day, $hour), $param)->fetchColumn();
+			} //for hour
+		} //for day
+	} else {
+		$toFrom = ($view == 'to') ? 'stop' : 'start';
+		for($day = 1;  $day <= 28;  $day++) {
+			for($hour = 0;  $hour < 24;  $hour++) {
+				$sTrips .= DB::Run(sprintf($qry, $toFrom, $day, $hour), $param)->fetchColumn();
+				$sTrips .= ',';
+			} //for hour
+		} //for day
+	} //else
+	$sTrips = rtrim($sTrips, ','); //remove trailing comma
 	return '['. $sTrips .']';
 //x	header('Content-Type: application/json');
 //x	return json_encode($aTrips);
 } //GetTrips
 
+// dbg("<pre>day=$day, hour=$hour, station=".($param[0] ?? 0) ."\n"
+// 	."  numOut=$numOut = ". sprintf($qry, 'start', $day, $hour) ."\n"
+// 	."   numIn=$numIn = ".  sprintf($qry, 'stop',  $day, $hour) ."</pre>\n");
+// exit;
 ?>

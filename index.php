@@ -20,15 +20,14 @@ if(isset($_GET['build']))  echo BuildDB();
 
 //GET parameters:
 //station=<num>: 0 = default = all stations
-//toFrom=<to|from>:
-//  to             = show "Returned To" = trips with stop_station = <station>
-//  from = default = show "Rented From" = trips with start_station = <station>
-//inventory=<''|true|false>:
-//  true = show running inventory (+/- bikes) at current station
-//  false = default = show #bikes to/from current station
+//view=<from (defualt) | to | inv[entory]>:
+//  from = show "Rented From" = trips with start_station = <station>
+//  to   = show "Returned To" = trips with stop_station = <station>
+//  inv  = show running inventory (+/- bikes) at current station
 $stationID = isset($_GET['station'])  ?  (intval($_GET['station']) ?: 0)  :  0;
-$toFrom    = $_GET['toFrom'] ?? 'from';
-$inventory = (isset($_GET['inventory'])  &&  $_GET['inventory'] != 'false');
+$view = strtolower($_GET['view'] ?? 'from');
+if($view == 'inventory')  $view = 'inv'; //allow 'inv' or 'inventory'
+if(!in_array($view, ['from', 'to', 'inv']))  $view = 'from';
 
 ?><!-- Copyright © 2022-<?=date('Y')?> Gary Strawn, All rights reserved -->
 <!DOCTYPE html>
@@ -56,25 +55,35 @@ foreach($aStations as $id => $name)
 	echo "    <option value=\"$id\"". ($stationID == $id ? ' selected' : '') .">$name</option>\n";
 ?>
   </select>
-  <section id="hourlyInput">
-    <div id="hourlyToFrom">
-      <label><input type="radio" name="hourlyToFrom" value="from"<?= 
-			$toFrom == 'from' ? ' checked' : '' ?>> Rented from</label>
-      <label><input type="radio" name="hourlyToFrom" value="to"<?=
-			$toFrom == 'to' ? ' checked' : '' ?>> Returned to</label>
-    </div>
+  <div id="hourlyView">
+    <label><input type="radio" name="hourlyView" value="from"<?= 
+			$view == 'from' ? ' checked' : '' ?>> Rented from</label>
+    <label><input type="radio" name="hourlyView" value="to"<?=
+			$view == 'to' ? ' checked' : '' ?>> Returned to</label>
+    <label><input type="radio" name="hourlyView" value="inv"<?=
+			$view == 'inv' ? ' checked' : '' ?>> Inventory</label>
+  </div>
+  <div id="hourlyInput">
     <label>Feb <input id="hourlyDate" type="number" min=1 max=28> 2015</label>
     <label>Hour: <input id="hourlyHour" type="number" min=0 max=23></label>
-    <label>Rented: <span id="hourlyRented"></span></label>
-  </section>
+    <label>Rented: <span id="hourlyRented">-</span></label>
+  </div>
 </header>
 
 <!-- hourly table -->
 <img id="hourlyTableLoading" src="/img/wait_lg.gif">
 <table id="hourlyTable" style="display:none">
+  <caption><?php
+	$aCaption = [
+		'from' => 'Bikes rented during the hour',
+		'to'   => 'Bikes returned during the hour',
+		'inv'  => 'Bikes in-use during the hour<br>+1 when checked out,  -1 when returned'
+	];
+	echo $aCaption[$view];
+?></caption>
   <thead><tr><th></th><th>am</th><?php 
 		for($h=1; $h<24; $h++)  echo '<th>'.(($h%12) ?: 'pm').'</th>'; ?></tr></thead>
-  <tbody>
+  <tbody id="hourlyTableBody">
 <?php
 	for($day = 1, $id = 0;  $day <= 28;  $day++) {
 		echo "        <tr data-day=\"$day\"><th>$day</th>";
@@ -86,14 +95,7 @@ foreach($aStations as $id => $name)
   </tbody>
 </table>
 
-<!-- notes -->
-<ul id="hourlyNotes">
-  <li id="noteNumber">Numbers indicate bikes rented during each hour. For example, a bike rented from 2:59pm to 3:01pm (two minutes) will show as rented at both 2pm and 3pm.</li>
-  <li id="noteStation">Only <span id="noteStationToFrom">START</span> station matters. The other end of the trip could be anywhere.</li>
-</ul>
-
 <!-- stats -->
-<h4>Part 3 Statistics</h4>
 <dl id="hourlyStats">
 </dl>
 
@@ -132,12 +134,13 @@ $aAge = DB::Run('SELECT MIN(2015 - `birth_year`) as `ageMin`,
 </table>
 
 
+<div id="srcLink"><a href="https://github.com/g6strawn/littleotter">Source on GitHub</a></div>
 <hr>
 <div id="ftrCopyright">
-  Copyright &copy; 2022-<?=date('Y')?> <a href="/">Gary Strawn</a> All rights reserved
+  Copyright &copy; 2022-<?=date('Y')?> <a href="https://gstrawn.dev">Gary Strawn</a> All rights reserved
 </div>
 
-<script>const g_aTrips = <?= GetTrips($stationID, $toFrom, $inventory) ?></script>
+<script>const g_aTrips = <?= GetTrips($stationID, $view) ?></script>
 <?= IsLocalHost() ? '<script>window.isLocalHost = true</script>' : '' ?>
 </body>
 </html>

@@ -12,11 +12,8 @@
   body { min-width: 535px; }
 }
 
-h1, h4 {
+h1 {
   text-align: center;
-}
-h4 {
-  margin-bottom: 0;
 }
 
 
@@ -27,19 +24,17 @@ h4 {
   margin: 0 auto;
 }
 
-#hourlyInput {
+#hourlyView {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  gap: 1em;
   margin: 1em auto;
+  gap: 1em;
 }
 
-#hourlyToFrom {
-  display: inline-block;
+#hourlyInput {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  gap: 1em;
 }
 
 #hourlyDate, #hourlyHour {
@@ -66,6 +61,11 @@ img#hourlyTableLoading {
   cursor: pointer;
   user-select: none;
 }
+#hourlyTable caption {
+  font-size: larger;
+  font-weight: bold;
+  margin-bottom: 0.25em;
+}
 #hourlyTable th {
   font-size: smaller;
   width: 1.5em;
@@ -82,20 +82,6 @@ img#hourlyTableLoading {
   border: 1px solid yellow;
 }
 
-
-/* footer notes */
-#hourlyNotes {
-  max-width: 480px;
-  margin: 0.5em auto 2em auto;
-  font-size: small;
-}
-#hourlyNotes li {
-  padding-bottom: 0.25em;
-}
-#noteStationToFrom {
-  font-weight: bold;
-  font-size: larger;
-}
 
 /* statistics - single line instead of two */
 dl {
@@ -135,6 +121,10 @@ dd { grid-column-start: 2;  margin-inline-start: 0.5em; }
   text-overflow: ellipsis;
 }
 
+
+#srcLink {
+  text-align: center;
+}
 hr {
   width: 50%;
   color: lightgray;

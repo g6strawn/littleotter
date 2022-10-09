@@ -20,18 +20,19 @@ function updateCanvas(aTrips) {
 	if(!aTrips  ||  aTrips.length != 24*28)  return;
 
 	//create properly sized canvas
-	const tbl = document.getElementById('hourlyTable');
+	const tbl = document.getElementById('hourlyTableBody');
 	const canvas  = document.createElement('canvas');
 	canvas.width  = tbl.clientWidth;
 	canvas.height = tbl.clientHeight;
 
 	//clear canvas
 	const ctx = canvas.getContext('2d');
-	ctx.fillStyle = 'rgba(0,0,0,0)'; //top/left header areas are transparent
+	ctx.fillStyle = 'rgba(0,0,0,0)'; //left margin is transparent
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	//fill cells with green squares
 	const maxRented = Math.max(...aTrips);
+	let yOffset = 0;
 	for(let day = 1, i = 0;  day <= 28;  day++) {
 		for(let hour = 0;  hour < 24;  hour++, i++) {
 			const percent = aTrips[i] / maxRented;
@@ -39,8 +40,9 @@ function updateCanvas(aTrips) {
 			ctx.fillStyle = `rgb(0, ${green}, 0)`;
 
 			const td = tbl.querySelector('#td'+i);
-			ctx.fillRect(td.offsetLeft, td.offsetTop, td.clientWidth, td.clientHeight);
+			ctx.fillRect(td.offsetLeft, yOffset, td.clientWidth, td.clientHeight);
 		}
+		yOffset += tbl.querySelector(`tr[data-day="${day}"]`).clientHeight;
 	}
 
 	//set canvas as table's background image
@@ -83,12 +85,15 @@ function updateStats(aTrips) {
 	addStat('Average', strFloat(total / (28*24)) +' bikes / hour');
 
 	//ex: Busiest: 20 Feb, 2am @ 23.4 bikes
-	function sDay(i)  { return Math.floor(i / 24) + 1; }
+	function sDay(i)   { return Math.floor(i / 24) + 1; }
 	function sHour(i)  { return strHour(i); }
 	function sAvg(i)   { return strFloat(aTrips[i]); }
-	addStat(    'Busiest', `${sDay(iBusy1)} Feb, ${sHour(iBusy1)} @ ${sAvg(iBusy1)} bikes`);
-	addStat('2nd busiest', `${sDay(iBusy2)} Feb, ${sHour(iBusy2)} @ ${sAvg(iBusy2)} bikes`);
-	addStat('3rd busiest', `${sDay(iBusy3)} Feb, ${sHour(iBusy3)} @ ${sAvg(iBusy3)} bikes`);
+	function addBusyStat(title, i) {
+		addStat(title, `${sDay(i)} Feb, ${sHour(i)} @ ${sAvg(i)} bikes`);
+	}
+	addBusyStat('Busiest', iBusy1);
+	if(iBusy2 >= 0)  addBusyStat('2nd busiest', iBusy2);
+	if(iBusy3 >= 0)  addBusyStat('3rd busiest', iBusy3);
 
 	//ex: Best time: 5pm @ 3.1 bikes average
 	let iTime1 = -1, iTime2 = -1, iTime3 = -1; //1st, 2nd, 3rd busiest
@@ -98,9 +103,13 @@ function updateStats(aTrips) {
 			iTime2 = iTime1;
 			iTime1 = hour;
 		}
-	addStat(    'Best time', `${strHour(iTime1)} @ ${strFloat(aHour[iTime1] / 24)} bikes`);
-	addStat('2nd best time', `${strHour(iTime2)} @ ${strFloat(aHour[iTime2] / 24)} bikes`);
-	addStat('3rd best rime', `${strHour(iTime3)} @ ${strFloat(aHour[iTime3] / 24)} bikes`);
+
+	function addBestStat(title, i) {
+		addStat(title, `${strHour(i)} @ ${strFloat(aHour[i] / 24)} bikes`);
+	}
+	addBestStat('Best time', iTime1);
+	if(iBusy2 >= 0)  addBestStat('2nd best time', iTime2);
+	if(iBusy3 >= 0)  addBestStat('3rd best time', iTime3);
 
 	document.getElementById('hourlyStats').replaceChildren(...aStats);
 } //updateStats
@@ -167,7 +176,6 @@ function fetchHourly() {
 function redirect() {
 	document.getElementById('hourlyTableLoading').style.display = '';
 	document.getElementById('hourlyTable').style.display = 'none';
-	document.getElementById('hourlyNotes').style.display = 'none';
 	document.getElementById('hourlyStats').style.display = 'none';
 	if(document.getElementById('allAges'))
 		document.getElementById('allAges').style.display = 'none';
@@ -175,7 +183,7 @@ function redirect() {
 	const url = new URL(document.location);
 	url.search = new URLSearchParams({
 		station: Number(document.getElementById('station').value),
-		toFrom: document.querySelector('#hourlyToFrom input:checked').value
+		view: document.querySelector('#hourlyView input:checked').value
 	});
 	location.replace(url);
 } //redirect
@@ -187,8 +195,8 @@ document.getElementById('station')?.addEventListener('change', () => redirect() 
 
 
 //---------------------------------------------------------------------------
-//<radio to|from>.onClick - refresh data with to|from station
-document.querySelectorAll('#hourlyInput input[type=radio]').forEach(btn => 
+//<radio from|to|inv>.onClick - refresh data with to|from station
+document.querySelectorAll('#hourlyView input[type=radio]').forEach(btn => 
 	btn.addEventListener('click', () => redirect()));
 
 
