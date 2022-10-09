@@ -6,7 +6,7 @@
 
 ### Deployment
 
-* The GitHub code is NOT deployable. For the sake of easy development, I reused some of my existing, proprietary code and therefore deployed on my existing, private server.
+* The GitHub code is NOT deployable. For the sake of easy development, I reused some of my existing, proprietary code and therefore deployed on my existing, private server: [gstrawn.dev/otter](https://gstrawn.dev/otter)
 
 ### Source code
 
